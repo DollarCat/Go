@@ -2,16 +2,16 @@ package main
 
 import "fmt"
 
-//自定义类型
+// 自定义类型
 type myInt int
 
 // type myFn func(int, int) int
 
-//类型别名
+// 类型别名
 type myFloat = float64
 
-//结构体定义
-//注意：结构体首字母可以大写也可以小写，大写表示这个结构体是公有的，在其他的包里面 可以使用。小写表示这个结构体是私有的，只有这个包里面才能使用
+// 结构体定义
+// 注意：结构体首字母可以大写也可以小写，大写表示这个结构体是公有的，在其他的包里面 可以使用。小写表示这个结构体是私有的，只有这个包里面才能使用
 type Person struct {
 	name string
 	age  int
@@ -24,12 +24,12 @@ type Person struct {
 	2、下方函数接收者为p，类型为Person
 */
 
-//值类型接收者，修改操作仅针对副本
+// 值类型接收者，修改操作仅针对副本
 func (p Person) PrintInfo() {
 	fmt.Printf("姓名：%v 年龄:%v\n", p.name, p.age)
 }
 
-//引用类型接收者，修改接收者指针的任意成员变量都是有效的，类似其他语言的this或者self
+// 引用类型接收者，修改接收者指针的任意成员变量都是有效的，类似其他语言的this或者self
 func (p *Person) SetInfo(name string, age int) {
 	p.name = name
 	p.age = age

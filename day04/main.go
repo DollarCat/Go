@@ -9,13 +9,13 @@ import "fmt"
 	}
 */
 
-//函数参数的简写
+// 函数参数的简写
 func subFn(x, y int) int {
 	sub := x - y
 	return sub
 }
 
-//函数的可变参数，可变参数是指函数的参数数量不固定。Go 语言中的可变参数通过在参数名后加...来标识
+// 函数的可变参数，可变参数是指函数的参数数量不固定。Go 语言中的可变参数通过在参数名后加...来标识
 func sumFn1(x ...int) int {
 
 	// fmt.Printf("%v--%T", x, x) //[12 34 45 46]--[]int
@@ -27,15 +27,15 @@ func sumFn1(x ...int) int {
 	return sum
 }
 
-//函数返回值：
-//return 关键词一次可以返回多个值
+// 函数返回值：
+// return 关键词一次可以返回多个值
 func calc(x, y int) (int, int) {
 	sum := x + y
 	sub := x - y
 	return sum, sub
 }
 
-//返回值命名: 函数定义时可以给返回值命名，并在函数体中直接使用这些变量，最后通过 return 关键字返回。
+// 返回值命名: 函数定义时可以给返回值命名，并在函数体中直接使用这些变量，最后通过 return 关键字返回。
 func calc1(x, y int) (sum int, sub int) {
 	fmt.Println(sum, sub)
 	sum = x + y
