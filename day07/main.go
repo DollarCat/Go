@@ -14,7 +14,13 @@ type Phone struct {
 	Name string
 }
 
-//手机要实现usb接口的话必须得实现usb接口中的所有方法
+/*
+1、手机要实现usb接口的话必须得实现usb接口中的所有方法
+
+2、结构体值接收者实现接口：
+值接收者： 如果结构体中的方法是值接收者，那么实例化后的结构体值类型和结构体指针类型都可以赋值给接口变量
+
+*/
 func (p Phone) start() {
 	fmt.Println(p.Name, "启动")
 }
@@ -57,7 +63,7 @@ func show(a interface{}) {
 	fmt.Printf("值:%v 类型:%T\n", a, a)
 }
 
-/*类型断言
+/*类型断言：用于判断空接口中值的类型
 定义一个方法，可以传入任意数据类型，然后根据不同的类型实现不同的功能
 原型：x.(T)
 x : 表示类型为 interface{}的变量
@@ -88,6 +94,25 @@ func MyPrint2(x interface{}) {
 	default:
 		fmt.Println("传入错误...")
 	}
+}
+
+/*
+结构体指针接收者实现接口：
+
+指针接收者： 如果结构体中的方法是指针接收者，那么实例化后结构体指针类型都可以赋值给接口变量， 结构体值类型没法赋值给接口变量。
+
+*/
+type Usber1 interface {
+	start1()
+	stop1()
+}
+
+func (p *Phone) start1() { //指针接收者
+	fmt.Println(p.Name, "启动")
+}
+
+func (p *Phone) stop1() {
+	fmt.Println(p.Name, "关机")
 }
 
 func main() {
@@ -152,4 +177,27 @@ func main() {
 
 	MyPrint2("你好golang")
 	MyPrint2(true)
+
+	// 结构体值接收者例化后的结构体值类型和结构体指针类型都可以赋值给接口变量
+	fmt.Println("\n结构体值接收者例化后的结构体值类型和结构体指针类型都可以赋值给接口变量\n")
+	var p2 = Phone{
+		Name: "小米手机",
+	}
+	var p3 Usber = p2 //表示让Phone实现Usb的接口
+	p3.start()
+
+	var p4 = &Phone{
+		Name: "苹果手机",
+	}
+	var p5 Usber = p4 //表示让Phone实现Usb的接口
+	p5.start()
+
+	//指针接收者
+	fmt.Println("\n指针接收者\n")
+	var phone1 = &Phone{
+		Name: "苹果15pro max",
+	}
+	var p6 Usber1 = phone1
+	p6.start1()
+	p6.stop1()
 }
