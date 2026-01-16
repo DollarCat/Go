@@ -45,6 +45,25 @@ func test3(num int) {
 	}
 }
 
+// 统计1-120000的数字中那些是素数？goroutine  for循环实现
+func test4(n int) {
+	for num := (n-1)*30000 + 1; num < n*30000; num++ {
+		if num > 1 {
+			var flag = true
+			for i := 2; i < num; i++ {
+				if num%i == 0 {
+					flag = false
+					break
+				}
+			}
+			if flag {
+				// fmt.Println(num, "是素数")
+			}
+		}
+	}
+	wg.Done()
+}
+
 func main() {
 	// go test() //表示开启一个协程
 	// for i := 0; i < 10; i++ {
@@ -78,20 +97,31 @@ func main() {
 	// fmt.Println("关闭主线程...")
 
 	//统计1-120000的数字中那些是素数？for循环实现
-	start := time.Now().Unix()
-	for num := 2; num < 120000; num++ {
-		var flag = true
-		for i := 2; i < num; i++ {
-			if num%i == 0 {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			// fmt.Println(num, "是素数")
-		}
-	}
-	end := time.Now().Unix()
+	// start := time.Now().Unix()
+	// for num := 2; num < 120000; num++ {
+	// 	var flag = true
+	// 	for i := 2; i < num; i++ {
+	// 		if num%i == 0 {
+	// 			flag = false
+	// 			break
+	// 		}
+	// 	}
+	// 	if flag {
+	// 		fmt.Println(num, "是素数")
+	// 	}
+	// }
+	// end := time.Now().Unix()
 
-	fmt.Println(end - start) //11毫秒  11毫秒
+	// fmt.Println(end - start) //6秒
+
+	//统计1-120000的数字中那些是素数？goroutine  for循环实现
+	start := time.Now().Unix()
+	for i := 1; i <= 4; i++ {
+		wg.Add(1)
+		go test4(i)
+	}
+	wg.Wait()
+	fmt.Println("执行完毕")
+	end := time.Now().Unix()
+	fmt.Println(end - start) //2毫秒
 }
