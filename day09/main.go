@@ -50,6 +50,47 @@ func fn2(ch chan int) {
 	wg.Done()
 }
 
+// 向 intChan放入 1-120000个数，具体设计参考附件goroutine&channel找素数设计.png
+// 素数：就是除了 1 和它本身不能被其他数整除的数
+func putNum1(intChan chan int) {
+	for i := 2; i < 120000; i++ {
+		intChan <- i
+	}
+	close(intChan)
+	wg.Done()
+}
+
+// 从 intChan取出数据，并判断是否为素数,如果是，就把得到的素数放在primeChan
+func primeNum(intChan chan int, primeChan chan int, exitChan chan bool) {
+	for num := range intChan {
+		var flag = true
+		for i := 2; i < num; i++ {
+			if num%i == 0 {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			primeChan <- num //num是素数
+		}
+	}
+	//要关闭 primeChan
+	// close(primeChan) //如果一个channel关闭了就没法给这个channel发送数据了
+	//什么时候关闭primeChan?
+
+	//给exitChan里面放入一条数据
+	exitChan <- true
+	wg.Done()
+}
+
+// printPrime打印素数的方法
+func printPrime(primeChan chan int) {
+	for v := range primeChan {
+		fmt.Println(v)
+	}
+	wg.Done()
+}
+
 func main() {
 	//1、创建channel
 	ch := make(chan int, 3)
@@ -151,24 +192,69 @@ func main() {
 	// //下面的写法是错误的!编译不通过, newCat 的类型是 interface{}，interface{} 类型没有 Name 字段
 	// //fmt.Printf("newCat.Name=%v", newCat.Name)
 	//使用类型断言，类型断言会知道变量实际的类型，所以得出aa为Cat类型
-	aa := newCat.(Cat)
-	fmt.Printf("aa.Name=%v", aa.Name)
+	// aa := newCat.(Cat)
+	// fmt.Printf("aa.Name=%v", aa.Name)
 
-	fmt.Printf("aa=%T , aa=%v\n", aa, aa)
+	// fmt.Printf("aa=%T , aa=%v\n", aa, aa)
 
-	var intChan = make(chan int, 1000)
+	// var intChan = make(chan int, 1000)
+	// wg.Add(1)
+	// go putNum(intChan)
+	// wg.Wait()
+
+	// fmt.Println("\n=======================需求：使用goroutine和channel协同工作案例: \n")
+	// var ch11 = make(chan int, 10)
+
+	/*
+		- fn1写入第一个数据 ：写入1，然后沉睡5秒
+		- fn2立即读取 ：读取到1，沉睡10毫秒
+		- fn2等待 ：由于管道为空，fn2在 range 处阻塞等待
+		- fn1苏醒 ：5秒后写入第二个数据2，再次沉睡5秒
+		- fn2读取 ：立即读取到2，沉睡10毫秒后继续等待
+		- 重复此模式 直到fn1写入完10个数据并关闭管道
+	*/
+	// wg.Add(1)
+	// go fn1(ch11)
+	// wg.Add(1)
+	// go fn2(ch11)
+
+	// wg.Wait()
+	// fmt.Println("退出...")
+
+	// 向 intChan放入 1-120000个数，具体设计参考附件goroutine&channel找素数设计.png
+	start := time.Now().Unix()
+
+	intChan := make(chan int, 1000)
+	primeChan := make(chan int, 50000)
+	exitChan := make(chan bool, 16) //标识primeChan close
+
+	//存放数字的协程
 	wg.Add(1)
-	go putNum(intChan)
+	go putNum1(intChan)
+
+	//统计素数的协程
+	for i := 0; i < 16; i++ {
+		wg.Add(1)
+		go primeNum(intChan, primeChan, exitChan)
+	}
+
+	//打印素数的协程
+	wg.Add(1)
+	go printPrime(primeChan)
+
+	//判断exitChan是否存满值
+	wg.Add(1)
+	go func() {
+		for i := 0; i < 16; i++ {
+			<-exitChan // 等待16个完成信号
+		}
+		// 所有素数判断协程完成后关闭
+		close(primeChan)
+		wg.Done()
+	}()
+
 	wg.Wait()
 
-	fmt.Println("\n需求：使用goroutine和channel协同工作案例: \n")
-	var ch11 = make(chan int, 10)
-
-	wg.Add(1)
-	go fn1(ch11)
-	wg.Add(1)
-	go fn2(ch11)
-
-	wg.Wait()
-	fmt.Println("退出...")
+	end := time.Now().Unix()
+	fmt.Println("执行完毕....", end-start, "毫秒")
 }
