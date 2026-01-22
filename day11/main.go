@@ -123,9 +123,55 @@ func main() {
 
 		需要注意的是，切片扩容还会根据切片中元素的类型不同而做不同的处理，比如 int 和 string 类型的处理方式就不一样。
 	*/
-	var sliceA []int
-	for i := 1; i <= 10; i++ {
-		sliceA = append(sliceA, i)
-		fmt.Printf("%v 长度:%d 容量:%d\n", sliceA, len(sliceA), cap(sliceA))
-	}
+	// var sliceA []int
+	// for i := 1; i <= 10; i++ {
+	// 	sliceA = append(sliceA, i)
+	// 	fmt.Printf("%v 长度:%d 容量:%d\n", sliceA, len(sliceA), cap(sliceA))
+	// }
+
+	/*
+		值类型 ： 改变变量副本值的时候，不会改变变量本身的值
+		引用类型：改变变量副本值的时候，会改变变量本身的值
+	*/
+
+	// 切片就是引用数据类型
+	// sliceA := []int{1, 2, 3, 45}
+	// sliceB := sliceA
+	// sliceB[0] = 11
+	// fmt.Println(sliceA)
+	// fmt.Println(sliceB)
+
+	//1、copy()函数复制切片
+	// sliceA := []int{1, 2, 3, 45}
+	// sliceB := make([]int, 4, 4)
+	// copy(sliceB, sliceA)
+
+	// fmt.Println(sliceA)
+	// fmt.Println(sliceB)
+	// sliceB[0] = 111
+	// fmt.Println(sliceA) //[1 2 3 45]
+	// fmt.Println(sliceB) //[111 2 3 45]
+
+	// Go 语言中并没有删除切片元素的专用方法，我们可以使用切片本身的特性来删除元素
+	sliceA := []int{30, 31, 32, 33, 34, 35, 36, 37}
+	// 要删除索引为 2 的元素  删除的元素：32  注意：append合并切片的时候最后一个元素要加...
+	sliceA = append(sliceA[:2], sliceA[3:]...)
+	fmt.Println(sliceA)
+
+	//要删除35, 36
+	sliceB := []int{30, 31, 32, 33, 34, 35, 36, 37}
+	sliceB = append(sliceB[:5], sliceB[7:]...)
+	fmt.Println(sliceB)
+
+	//string类型的切片
+	s1 := "big"
+	byteStr := []byte(s1)
+	byteStr[0] = 'p'
+	fmt.Println(string(byteStr))
+	//rune是int32的别名类型，用于表示Unicode码点（code point），在内存中占用4个字节，主要作用是处理Unicode字符如中文、日文、韩文等的字符串
+	s2 := "你好golang"
+	runeStr := []rune(s2)
+	fmt.Println(runeStr) //[20320 22909 103 111 108 97 110 103]
+	runeStr[0] = '大'
+	fmt.Println(string(runeStr))
 }
