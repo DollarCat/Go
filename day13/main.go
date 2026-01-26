@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"text/template"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,14 +15,56 @@ type Article struct {
 	Content string `json:"content"`
 }
 
+// 时间戳转换成日期
+func UnixToTime(timestamp int) string {
+	fmt.Println(timestamp)
+	//- 第一个参数 sec ：秒数（Unix 时间戳）- 第二个参数 nsec ：纳秒数（用于更精确的时间）
+	t := time.Unix(int64(timestamp), 0)
+	return t.Format("2006-01-02 15:04:05")
+}
+
+func Println(str1 string, str2 string) string {
+	fmt.Println(str1, str2)
+	return str1 + "----" + str2
+}
+
 func main() {
 	// 创建一个默认的路由引擎
 	r := gin.Default()
-	//配置模版的文件
-	r.LoadHTMLGlob("templates/*")
+	//自定义模板函数  注意要把这个函数放在加载模板前
+	//模板加载时会解析模板内容，如果函数还没注册，模板引擎会报错找不到函数
+	r.SetFuncMap(template.FuncMap{
+		"UnixToTime": UnixToTime,
+		"Println":    Println,
+	})
+	//加载模板
+	r.LoadHTMLGlob("templates/**/*")
+	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
+	r.Static("/static", "./static")
 	//配置路由
 	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "值:%v", "你好gin")
+		c.HTML(http.StatusOK, "default/index.html", gin.H{
+			"title": "aaa",
+			"msg":   " 我是msg",
+			"score": 89,
+			"hobby": []string{"吃饭", "睡觉", "写代码"},
+			"newsList": []interface{}{
+				&Article{
+					Title:   "新闻标题111",
+					Content: "新闻详情111",
+				},
+				&Article{
+					Title:   "新闻标题222",
+					Content: "新闻详情222",
+				},
+			},
+			"testSlice": []string{},
+			"news": &Article{
+				Title:   "新闻标题",
+				Content: "新闻内容",
+			},
+			"date": 1629423555,
+		})
 	})
 
 	r.POST("/add", func(c *gin.Context) {
@@ -85,15 +130,25 @@ func main() {
 	})
 
 	r.GET("/news", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "news.html", gin.H{
-			"title": "我是后台的数据",
+		news := &Article{
+			Title:   "新闻标题",
+			Content: "新闻详情",
+		}
+		c.HTML(http.StatusOK, "default/news.html", gin.H{
+			"title": "新闻页面",
+			"news":  news,
 		})
 	})
 
-	r.GET("/goods", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "goods.html", gin.H{
-			"title": "我是商品页面",
-			"price": 20,
+	//后台
+	r.GET("/admin", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "admin/index.html", gin.H{
+			"title": "后台首页",
+		})
+	})
+	r.GET("/admin/news", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "admin/news.html", gin.H{
+			"title": "新闻页面",
 		})
 	})
 
