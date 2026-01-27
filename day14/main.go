@@ -10,6 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/*
+同一个结构体可以处理多种数据格式：
+- GET请求 → 使用 form 标签匹配URL参数
+- POST表单 → 使用 form 标签匹配表单数据
+- POST JSON → 使用 json 标签匹配JSON字段
+- POST XML → 使用 xml 标签匹配XML元素
+*/
 type UserInfo struct {
 	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
@@ -84,6 +91,12 @@ func main() {
 
 	r.GET("/getUser", func(c *gin.Context) {
 		user := &UserInfo{}
+		/*
+			c.ShouldBind自动根据请求类型（GET/POST）和结构体标签，将请求参数绑定到 user 结构体
+			通过 结构体标签 来匹配字段，如：`json:"username" form:"username"`
+			绑定成功返回 nil ，失败返回错误
+
+		*/
 		if err := c.ShouldBind(&user); err == nil {
 			fmt.Printf("%#v", user)
 			c.JSON(http.StatusOK, user)
@@ -121,9 +134,12 @@ func main() {
 		}
 
 	})
-	// 动态路由传值
-	//  list/123          list/456
-
+	/*
+		动态路由传值
+		- : 表示这是一个动态参数
+		- cid 是参数名
+		使用接口方式：list/123          list/456
+	*/
 	r.GET("/list/:cid", func(c *gin.Context) {
 
 		cid := c.Param("cid")
