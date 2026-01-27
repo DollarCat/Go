@@ -9,6 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserInfo struct {
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+}
+
 type Article struct {
 	Title   string `json:"title"`
 	Desc    string `json:"desc"`
@@ -37,7 +42,7 @@ func main() {
 		"UnixToTime": UnixToTime,
 		"Println":    Println,
 	})
-	//加载模板
+	//加载模板，放在配置路由前面
 	r.LoadHTMLGlob("templates/**/*")
 	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
 	r.Static("/static", "./static")
