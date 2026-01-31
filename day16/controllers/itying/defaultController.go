@@ -11,6 +11,7 @@ type DefaultController struct{}
 func (con DefaultController) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "default/index.html", gin.H{
 		"msg": "我是一个msg",
+		"t":   1629788418,
 	})
 }
 func (con DefaultController) News(c *gin.Context) {

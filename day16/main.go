@@ -1,6 +1,7 @@
 package main
 
 import (
+	"day16/models"
 	"day16/routers"
 	"fmt"
 	"html/template"
@@ -8,13 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-// 时间戳转换成日期
-func UnixToTime(timestamp int) string {
-	fmt.Println(timestamp)
-	t := time.Unix(int64(timestamp), 0)
-	return t.Format("2006-01-02 15:04:05")
-}
 
 func initMiddleware(c *gin.Context) {
 	start := time.Now().UnixNano()
@@ -46,7 +40,7 @@ func main() {
 	r := gin.Default()
 	//自定义模板函数  注意要把这个函数放在加载模板前
 	r.SetFuncMap(template.FuncMap{
-		"UnixToTime": UnixToTime,
+		"UnixToTime": models.UnixToTime,
 	})
 	//加载模板 放在配置路由前面
 	r.LoadHTMLGlob("templates/**/*")
