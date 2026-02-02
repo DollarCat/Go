@@ -59,5 +59,5 @@ func main() {
 
 	routers.DefaultRoutersInit(r)
 
-	r.Run()
+	r.Run(":80")
 }

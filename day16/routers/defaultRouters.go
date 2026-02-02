@@ -11,5 +11,7 @@ func DefaultRoutersInit(r *gin.Engine) {
 	{
 		defaultRouters.GET("/", itying.DefaultController{}.Index)
 		defaultRouters.GET("/news", itying.DefaultController{}.News)
+		defaultRouters.GET("/shop", itying.DefaultController{}.Shop)
+		defaultRouters.GET("/deleteCookie", itying.DefaultController{}.DeleteCookie)
 	}
 }
