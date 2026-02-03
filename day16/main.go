@@ -55,6 +55,11 @@ func main() {
 	store := cookie.NewStore([]byte("secret111"))
 	//配置session的中间件 store是前面创建的存储引擎，我们可以替换成其他存储引擎
 	r.Use(sessions.Sessions("mysession", store))
+	/*
+		//配置session中间件 把session存储到Redis
+		store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret111"))
+		r.Use(sessions.Sessions("mysession", store))
+	*/
 
 	r.GET("/initMiddleware", initMiddleware, initMiddleware2, func(c *gin.Context) {
 		fmt.Println("这是一个首页")
